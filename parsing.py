@@ -1,3 +1,4 @@
+import re
 import numpy as np
 
 
@@ -26,24 +27,37 @@ def getLocation(soup):
     try:
         location = soup.find('div', id = 'location').find('div', class_ = 'location').find('div', class_ = 'subtitle').text.strip()
     except:
-        location = np.nan
+        try:
+            location = soup.find('div', class_ = 'location').find('div', class_ = 'subtitle').text.strip()
+        except:
+            location = np.nan
     return location
 
 def getLatLong(soup):
     try:
-        lat = soup.find('div', id = 'location').find('script', type = 'text/javascript').text.strip().split(';')[0].split('=')[-1].strip()
-        long = soup.find('div', id = 'location').find('script', type = 'text/javascript').text.strip().split(';')[1].split('=')[-1].strip()
+        # Find all script tags with the specified type
+        script_tags = soup.find_all('script', {'type': 'text/javascript'})
+
+        # Define a regular expression pattern to match lat and long values
+        pattern = re.compile(r'var _Lat = "(.*?)";\s*var _Long = "(.*?)";')
+
+        # Iterate through script tags to find and extract lat and long values
+        for script_tag in script_tags:
+            match = pattern.search(script_tag.text)
+            if match:
+                lat, long = match.groups()
+                return lat, long
+        lat, long = np.nan, np.nan
     except:
         lat, long = np.nan, np.nan
     return lat, long
 
 def getCharacteristics(soup):
     try:
-        charblocks = soup.find('div', class_ = 'characteristics').find_all('div', class_ = 'charblock')
+        charblocks = soup.find_all('div', class_ = 'charblock')
         characteristics = []
         for charblock in charblocks:
             characteristics.extend(charblock.find_all('li'))
-            
         characteristics = [' '.join(x.text.split('\n')).strip() for x in characteristics]
     except:
         characteristics = np.nan
