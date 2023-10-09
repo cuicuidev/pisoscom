@@ -1,29 +1,30 @@
 import re
 import numpy as np
+from bs4 import BeautifulSoup
+import datetime
 
-
-def getUrls(soups):
+def getUrls(soups: list[BeautifulSoup]):
     ads = []
     for soup in soups:
         ad = [x.find('a', class_='ad-preview__title')['href'] for x in soup.find('div', class_ = 'grid__wrapper').find_all('div', class_ = 'ad-preview')]
         ads.extend(ad)
     return ads
 
-def getPrice(soup):
+def getPrice(soup: BeautifulSoup):
     try:
         price = soup.find('div', class_ = 'maindata').find('div', class_ = 'priceBox-price').text.strip()
     except:
         price = np.nan
     return price
 
-def getTitle(soup):
+def getTitle(soup: BeautifulSoup):
     try:
         title = soup.find('div', class_ = 'maindata').find('h1', class_ = 'title').text.strip()
     except:
         title = np.nan
     return title
 
-def getLocation(soup):
+def getLocation(soup: BeautifulSoup):
     try:
         location = soup.find('div', id = 'location').find('div', class_ = 'location').find('div', class_ = 'subtitle').text.strip()
     except:
@@ -33,7 +34,7 @@ def getLocation(soup):
             location = np.nan
     return location
 
-def getLatLong(soup):
+def getLatLong(soup: BeautifulSoup):
     try:
         # Find all script tags with the specified type
         script_tags = soup.find_all('script', {'type': 'text/javascript'})
@@ -52,7 +53,7 @@ def getLatLong(soup):
         lat, long = np.nan, np.nan
     return lat, long
 
-def getCharacteristics(soup):
+def getCharacteristics(soup: BeautifulSoup):
     try:
         charblocks = soup.find_all('div', class_ = 'charblock')
         characteristics = []
@@ -62,3 +63,15 @@ def getCharacteristics(soup):
     except:
         characteristics = np.nan
     return characteristics
+
+def getAgencyDate(soup: BeautifulSoup):
+    owner_data = soup.find('div', class_ = 'owner-data')
+    updated_date_text = owner_data.find('div', class_ = 'updated-date').text.strip()
+
+    agency_text = ' '.join([x for x in owner_data.text.strip().split() if x not in updated_date_text])
+
+    updated_date = ''.join([x for x in updated_date_text if x.isnumeric()])
+    date = datetime.datetime.strptime(updated_date, '%d%M%Y')
+    timestamp = date.timestamp()
+
+    return timestamp, agency_text
