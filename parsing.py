@@ -122,7 +122,7 @@ def freeChurro(df):
                 key = key.strip()
                 dict_data[key] = value
             else:
-                key, value = content[0], 1
+                key, value = content[0], content[0]
                 key = key.strip()
                 dict_data[key] = value
 
