@@ -182,7 +182,7 @@ def getType(df):
 def getStreetType(df):
     
     types = ['calle', 'c', 'avenida', 'avda', 'av', 'plaza', 'pz', 'carretera', 'bulevar', 'boulevard', 'parque', 'paseo', 'autovía', 'autovia']
-    patterns = [f'[ ]*{x}[ .] ' for x in types]
+    patterns = [r'\b(?:' + re.escape(x) + r')\b' for x in types]
     
     street = []
     
@@ -194,13 +194,13 @@ def getStreetType(df):
         matches = []
         
         for pattern in patterns:
-            match_ = re.match(pattern, n.lower())
+            match_ = re.findall(pattern, n.lower())
             if match_ is not None:
-                matches.append(match_)
+                matches.extend(match_)
             else: matches.append(False)
         
         if any(matches):
-            street.append(' '.join([x for x in matches if x]))
+            street.append(' '.join([x for x in matches]))
         else: street.append(np.nan)
     
     df['street'] = street
