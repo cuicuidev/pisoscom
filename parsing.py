@@ -164,5 +164,38 @@ def nanReport(threshold, df_):
 ##############################################################################################################
 
 def getType(df):
+    type_ = []
     
-    pass
+    for n in df['title']:
+        if pd.isna(n):
+            type_.append(np.nan)
+            continue
+        if len(n) != 1:
+            name = n.split()[0]
+            type_.append(name)
+        else: type_.append(n)
+    
+    df['type'] = type_
+    
+    return df
+
+def getStreetType(df):
+    
+    types = ['calle', 'c', 'avenida', 'avda', 'plaza', 'pz', 'carretera', 'bulevar', 'boulevard', 'parque', 'paseo', 'autovía', 'autovia']
+    patterns = [f'[ ]*{x}[ .] ' for x in types]
+
+def getStreet(df):
+    street = []
+    
+    for n in df['location']:
+        if pd.isna(n):
+            street.append(np.nan)
+            continue
+        if len(n) != 1:
+            name = n.split()[0]
+            street.append(name)
+        else: street.append(n)
+    
+    df['street'] = street
+    
+    return df
