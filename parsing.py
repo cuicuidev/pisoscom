@@ -4,6 +4,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 import datetime
 import ast
+import requests
 
 def getUrls(soups: list[BeautifulSoup]):
     ads = []
@@ -67,14 +68,18 @@ def getCharacteristics(soup: BeautifulSoup):
     return characteristics
 
 def getAgencyDate(soup: BeautifulSoup):
-    owner_data = soup.find('div', class_ = 'owner-data')
-    updated_date_text = owner_data.find('div', class_ = 'updated-date').text.strip()
+    try:
+        owner_data = soup.find('div', class_ = 'owner-data')
+        updated_date_text = owner_data.find('div', class_ = 'updated-date').text.strip()
 
-    agency_text = ' '.join([x for x in owner_data.text.strip().split() if x not in updated_date_text])
+        agency_text = ' '.join([x for x in owner_data.text.strip().split() if x not in updated_date_text])
 
-    updated_date = ''.join([x for x in updated_date_text if x.isnumeric()])
-    date = datetime.datetime.strptime(updated_date, '%d%M%Y')
-    timestamp = date.timestamp()
+        updated_date = ''.join([x for x in updated_date_text if x.isnumeric()])
+        date = datetime.datetime.strptime(updated_date, '%d%M%Y')
+        timestamp = date.timestamp()
+    except:
+        agency_text = np.nan
+        timestamp = np.nan
 
     return timestamp, agency_text
 
@@ -155,3 +160,9 @@ def nanReport(threshold, df_):
     print(f'Porcentaje de valores perdidos en total: {1- df.dropna().shape[0] / df.shape[0]}')
     print(f'Columnas conservadas: {len(df.columns)}')
     return df
+
+##############################################################################################################
+
+def getType(df):
+    
+    pass
