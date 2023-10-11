@@ -181,21 +181,44 @@ def getType(df):
 
 def getStreetType(df):
     
-    types = ['calle', 'c', 'avenida', 'avda', 'plaza', 'pz', 'carretera', 'bulevar', 'boulevard', 'parque', 'paseo', 'autovía', 'autovia']
+    types = ['calle', 'c', 'avenida', 'avda', 'av', 'plaza', 'pz', 'carretera', 'bulevar', 'boulevard', 'parque', 'paseo', 'autovía', 'autovia']
     patterns = [f'[ ]*{x}[ .] ' for x in types]
-
-def getStreet(df):
+    
     street = []
     
     for n in df['location']:
         if pd.isna(n):
             street.append(np.nan)
             continue
-        if len(n) != 1:
-            name = n.split()[0]
-            street.append(name)
-        else: street.append(n)
+        
+        matches = []
+        
+        for pattern in patterns:
+            match_ = re.match(pattern, n.lower())
+            if match_ is not None:
+                matches.append(match_)
+            else: matches.append(False)
+        
+        if any(matches):
+            street.append(' '.join([x for x in matches if x]))
+        else: street.append(np.nan)
     
     df['street'] = street
     
     return df
+
+# def getStreet(df):
+#     street = []
+    
+#     for n in df['location']:
+#         if pd.isna(n):
+#             street.append(np.nan)
+#             continue
+#         if len(n) != 1:
+#             name = n.split()[0]
+#             street.append(name)
+#         else: street.append(n)
+    
+#     df['street'] = street
+    
+#     return df
