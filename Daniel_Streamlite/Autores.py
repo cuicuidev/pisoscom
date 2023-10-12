@@ -29,5 +29,5 @@ def Autores():
     
    
 
-if __name__ == "__Autores__":
+if __name__ == "__main__":
     Autores()
