@@ -3,6 +3,7 @@ from streamlit_lottie import st_lottie
 import requests
 import pickle
 import numpy as np
+import sklearn
 
 def app():
 

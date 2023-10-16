@@ -7,6 +7,7 @@ from streamlit_lottie import st_lottie  #Libreria necesaria para trabajar con lo
 import requests
 from streamlit_option_menu import option_menu    #Libreria necesaria para trabajar con lotties archivos json animados
 from datetime import date,datetime
+import sklearn
 
 #Importamos funciones de codigo en otros archivos
 # from intro import introduccion
