@@ -12,8 +12,8 @@ import sklearn
 #Importamos funciones de codigo en otros archivos
 # from intro import introduccion
 # from eda import eda1
-from Autores import Autores
-from APP import app
+from pages.Autores import Autores
+from pages.APP import app
 
 # Cargamos los DataFrames necesarios para el proyecto. Tengo todos los del EDA.
 

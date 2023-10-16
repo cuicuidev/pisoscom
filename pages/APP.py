@@ -3,7 +3,6 @@ from streamlit_lottie import st_lottie
 import requests
 import pickle
 import numpy as np
-import sklearn
 
 def app():
 
@@ -35,7 +34,7 @@ def app():
     cert=st.sidebar.selectbox("Selecciona si tiene el certificado energético:", Clasificacion)
     
 
-    with open('forest_madrid.pkl', 'rb') as file:
+    with open('model_test.pkl', 'rb') as file:
         modelo = pickle.load(file)
 
     lat=40.5934447

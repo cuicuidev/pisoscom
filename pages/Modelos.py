@@ -1,19 +1,14 @@
 # Importamos librerias 
 import streamlit as st
 import pandas as pd
-import matplotlib as plt
 import plotly.express as px
-import datetime
-from datetime import datetime
 import warnings
-warnings.filterwarnings("ignore")
-import matplotlib.pyplot as plt
-from keras.models import load_model
 import requests
-import json
-import numpy as np
 from streamlit_lottie import st_lottie
 import requests
+
+
+warnings.filterwarnings("ignore")
 
 #Cargamos DataFrames necesarios
 df_modelos_demanda = pd.read_csv('DF/Comparacion modelos demanda.csv')
