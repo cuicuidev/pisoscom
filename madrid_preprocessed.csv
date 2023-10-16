@@ -1,4 +1,4 @@
-price,lat,lng,updated,type,paseo,carretera,bulevar,autovia,calle,parque,plaza,avenida,publisher,age,garage,lift,surface,net_surface,garden,rooms,condition,bathrooms
+price,lat,lng,updated,type,bulevar,calle,avenida,parque,autovia,plaza,paseo,carretera,publisher,age,garage,lift,surface,net_surface,garden,rooms,condition,bathrooms
 176000.0,40.5934447,-4.1453858,1674860880.0,Apartamento,0,0,0,0,0,0,0,0,inmobiliaria,10.0,yes,yes,63.0,46.0,yes,1.0, A estrenar,1.0
 116500.0,40.4020793,-3.7021512,1674947340.0,Apartamento,2,2,2,2,2,2,2,2,inmobiliaria,50.0,no,yes,25.0,,no,,,1.0
 169000.0,40.5344572,-3.479415,1673392140.0,Apartamento,0,0,0,0,0,0,0,0,inmobiliaria,,no,yes,70.0,67.0,no,1.0, En buen estado,1.0
