@@ -35,3 +35,26 @@ def frequencyEncoding(df):
         df_frequency[column] = df_frequency[column].replace(encode)
         encodings_map[column] = encode
     return df_frequency, encodings_map
+
+def outliersFilter(df, min_price, max_price, max_baths, max_surface):
+    """
+    Recibe un DataFrame df, los máximos y mínimos de price, el máximo de bathrooms y el máximo de surface.
+    Retorna df con los outliers filtrados de acuerdo a los parámetros indicados.
+    """
+    df = df[df['price'].between(min_price, max_price)]
+    df = df[df['bathrooms']<=max_baths]
+    df = df[df['surface']<=max_surface]
+    return df
+
+def binaryEncoding(df):
+    """
+    Recibe un DataFrame df.
+    Retorna df con las catergorías cambiadas a binario.
+    """
+    df['garage'] = df['garage'].apply(lambda x: 1 if x == 'yes' else 0)
+    df['lift'] = df['lift'].apply(lambda x: 1 if x == 'yes' else 0)
+    df['garden'] = df['garden'].apply(lambda x: 1 if x == 'yes' else 0)
+    df['publisher'] = df['publisher'].apply(lambda x: 1 if x == 'inmobiliaria' else 0)
+    return df
+
+
