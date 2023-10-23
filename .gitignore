@@ -3,6 +3,8 @@ __pycache__/
 
 /html_content/
 
+/html_content_valencia/
+
 .ipynb_checkpoints/
 
 chromedriver.exe
