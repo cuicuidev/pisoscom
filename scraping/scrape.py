@@ -2,65 +2,104 @@ import os
 import requests
 import datetime
 import glob
+import time
+from playwright.sync_api import sync_playwright
 
 from bs4 import BeautifulSoup
-
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-
-from time import sleep
 
 
 
 base_url = 'https://www.pisos.com/'
 
-def scrape(urls):
-    browser = webdriver.Chrome()
+# def scrape(urls):
+#     browser = webdriver.Chrome()
     
+#     try: os.mkdir('html_content/')
+#     except FileExistsError as e: print(e)
+#     # finally:
+#     #     raise Exception('No funcionaaaaa!!!!! :)')
+    
+#     for idx, url in enumerate(urls):
+#         browser.get(url)
+#         # browser.maximize_window()
+
+#         if idx == 0:
+#             element = WebDriverWait(browser, 10).until(
+#                 EC.presence_of_element_located((By.XPATH, '//*[@id="didomi-notice-agree-button"]'))
+#             )
+
+#             element.click() # Accept cookies
+
+#         # <SCROLLING>
+#         while True:
+#             is_at_bottom = browser.execute_script("return window.scrollY + window.innerHeight >= document.body.scrollHeight")
+#             browser.execute_script("window.scroll({ top: document.body.scrollHeight, behavior: 'smooth' });")
+#             if is_at_bottom:
+#                 break
+#             sleep(0.2)
+#         # </SCROLLING>
+        
+#         html_content = browser.page_source
+
+#         timestamp = ''.join(str(datetime.datetime.now().timestamp()).split('.'))
+
+#         soft_url = url.replace('https://www.pisos.com/comprar/', '')
+#         soft_url = soft_url.replace('/', '_')
+#         soft_url = soft_url.replace('-', '_')
+
+#         file_path = f'html_content/{timestamp}_{soft_url}.html'
+#         try:
+#             with open(file_path, 'w', encoding='utf-8') as file:
+#                 file.write(html_content)
+#         except Exception as e:
+#             with open(file_path, 'w', encoding='utf-8') as file:
+#                 file.write(repr(e))
+
+#     browser.quit()
+
+def scrape(endpoints):
+
     try: os.mkdir('html_content/')
     except FileExistsError as e: print(e)
-    # finally:
-    #     raise Exception('No funcionaaaaa!!!!! :)')
-    
-    for idx, url in enumerate(urls):
-        browser.get(url)
-        # browser.maximize_window()
 
-        if idx == 0:
-            element = WebDriverWait(browser, 10).until(
-                EC.presence_of_element_located((By.XPATH, '//*[@id="didomi-notice-agree-button"]'))
-            )
+    with sync_playwright() as p:
+        b = p.chromium
+        browser = b.launch(headless=True)
+        page = browser.new_page()
 
-            element.click() # Accept cookies
+        for endpoint in endpoints:
+            page.goto(endpoint)
+            print(endpoint)
 
-        # <SCROLLING>
-        while True:
-            is_at_bottom = browser.execute_script("return window.scrollY + window.innerHeight >= document.body.scrollHeight")
-            browser.execute_script("window.scroll({ top: document.body.scrollHeight, behavior: 'smooth' });")
-            if is_at_bottom:
-                break
-            sleep(0.2)
-        # </SCROLLING>
-        
-        html_content = browser.page_source
+            _prev_height = -1
+            _max_scrolls = 100
+            _scroll_count = 0
+            while _scroll_count < _max_scrolls:
+                page.evaluate("window.scroll({ top: document.body.scrollHeight, behavior: 'smooth' });")
+                page.wait_for_timeout(1000)
+                new_height = page.evaluate("document.body.scrollHeight")
+                if new_height == _prev_height:
+                    break
+                _prev_height = new_height
+                _scroll_count += 1
 
-        timestamp = ''.join(str(datetime.datetime.now().timestamp()).split('.'))
+            content = page.content()
 
-        soft_url = url.replace('https://www.pisos.com/comprar/', '')
-        soft_url = soft_url.replace('/', '_')
-        soft_url = soft_url.replace('-', '_')
+            timestamp = ''.join(str(datetime.datetime.now().timestamp()).split('.'))
 
-        file_path = f'html_content/{timestamp}_{soft_url}.html'
-        try:
-            with open(file_path, 'w', encoding='utf-8') as file:
-                file.write(html_content)
-        except Exception as e:
-            with open(file_path, 'w', encoding='utf-8') as file:
-                file.write(repr(e))
+            soft_url = endpoint.replace('https://www.pisos.com/comprar/', '')
+            soft_url = soft_url.replace('/', '_')
+            soft_url = soft_url.replace('-', '_')
 
-    browser.quit()
+            file_path = f'html_content/{timestamp}_{soft_url}.html'
+            try:
+                with open(file_path, 'w', encoding='utf-8') as file:
+                    file.write(content)
+            except Exception as e:
+                with open(file_path, 'w', encoding='utf-8') as file:
+                    file.write(repr(e))
+                    
+        browser.close()
 
 
 def scanRegions(url):
@@ -187,8 +226,11 @@ def run(endpoint):
 
         urls = urls.split(',\n')
 
+    start = time.time()
     if start != -1:
         scrape(urls[start:])
     else:
-        scrape(urls)
-    
+        scrape(urls[:10])
+    end = time.time()
+    execution_time = end - start
+    print(f"Execution time: {execution_time} seconds")
