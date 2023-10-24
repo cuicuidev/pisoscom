@@ -6,17 +6,7 @@ El objeto del siguiente proyecto hacer una APP que nos permita saber el precio d
 En:
 The aim of the following project is to determine the market price of a house depending on its characteristics.
 
-Para scrapear una pagina (o reanudar tras un fallor)
+Para scrapear una pagina (los datos se guardan en `scraping/data/`)
 ```sh
 python cli.py scrape -e 'endpoint'
-```
-
-Para guardar extraer el contenido y guardarlo en csv una vez se ha terminado de scrapear
-```sh
-python cli.py commit -f 'filename'
-```
-
-Para resetear el entorno y poder scrapear de nuevo
-```sh
-python cli.py reset
 ```
