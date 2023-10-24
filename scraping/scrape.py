@@ -26,7 +26,7 @@ def run(endpoint):
     n_rows = 0
 
     if not data_exists:
-        with open(DATA_PATH, 'w') as f:
+        with open(DATA_PATH, 'w', encoding = 'utf-8') as f:
             f.write('price,title,province,location,lat,lng,characteristics,agency,updated,numeric_data\n')
 
         urls = scanRegions(URL)
@@ -47,7 +47,7 @@ def run(endpoint):
             file.writelines(all_urls)
     else:
 
-        with open(DATA_PATH) as f:
+        with open(DATA_PATH, encoding = 'utf-8') as f:
             n_rows = len(f.read().split('\n')) - 2
 
     with open('scraping/temp/urls.csv') as file:
