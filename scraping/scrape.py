@@ -57,7 +57,7 @@ def run(endpoint):
 
     if n_rows != 0:
         print(f'Starting from row {n_rows}')
-        to_scrape = all_urls[n_rows - 1]
+        to_scrape = all_urls[n_rows - 1:]
     else:
         to_scrape = all_urls
 
