@@ -154,12 +154,14 @@ def run(endpoint):
 
     PROVINCE = endpoint
 
-    start = None
-
     try:
-        size = len(glob.glob('html_content/*.html'))
+        glb = glob.glob('html_content/*.html')
+        print(glb)
+        size = len(glb)
+        print(size)
         start = size - 1
-    except: pass
+    except: 
+        start = -1
 
     URL = f'https://www.pisos.com/viviendas/{PROVINCE}/'
 
@@ -170,7 +172,7 @@ def run(endpoint):
     urls = [x.replace('//viviendas/', '/venta/pisos-') for x in urls]
     print(urls)
 
-    if start is None:
+    if start == -1:
         print('urls loop')
         for url in urls:
             urls_ = scrapeUrls(url)
@@ -185,7 +187,7 @@ def run(endpoint):
 
         urls = urls.split(',\n')
 
-    if start is not None:
+    if start != -1:
         scrape(urls[start:])
     else:
         scrape(urls)
