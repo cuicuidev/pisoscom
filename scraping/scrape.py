@@ -61,19 +61,24 @@ def run(endpoint):
     else:
         to_scrape = all_urls
 
-    for html, metadata in scrape(to_scrape):
-        with open(DATA_PATH, 'a+', encoding = 'utf-8') as f:
-            soup = BeautifulSoup(html, 'html.parser')
+    try:
+        for html, metadata in scrape(to_scrape):
+            with open(DATA_PATH, 'a+', encoding = 'utf-8') as f:
+                soup = BeautifulSoup(html, 'html.parser')
 
-            price = getPrice(soup)
-            title = getTitle(soup)
-            location = getLocation(soup)
-            lat, long = getLatLong(soup)
-            characteristics = getCharacteristics(soup)
-            updated, agency = getAgencyDate(soup)
+                price = getPrice(soup)
+                title = getTitle(soup)
+                location = getLocation(soup)
+                lat, long = getLatLong(soup)
+                characteristics = getCharacteristics(soup)
+                updated, agency = getAgencyDate(soup)
 
-            data = f'{price},{title},{location},{lat},{long},{characteristics},{agency},{updated},{metadata}\n'
-            f.write(data)
+                data = f'{price},{title},{location},{lat},{long},{characteristics},{agency},{updated},{metadata}\n'
+                f.write(data)
+    except:
+        print('FAILED FOR SOME REASON...')
+        run(endpoint)
+        return
 
     ############################################
     

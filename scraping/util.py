@@ -20,7 +20,7 @@ def scrape(endpoints):
         page = browser.new_page()
 
         for endpoint in endpoints:
-            page.goto(endpoint)
+            page.goto(endpoint, timeout = 60000)
             print(endpoint)
 
             _prev_height = -1
