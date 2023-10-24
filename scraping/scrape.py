@@ -14,7 +14,7 @@ def run(endpoint):
 
     URL = f'https://www.pisos.com/viviendas/{endpoint}/'
 
-    DATA_PATH = f'scraping_2/data/{endpoint}.csv'
+    DATA_PATH = f'scraping/data/{endpoint}.csv'
 
     data_exists = bool(len(glob.glob(DATA_PATH)))
 
@@ -42,15 +42,15 @@ def run(endpoint):
             urls_ = [base_url[:-1] + x for x in urls_]
             all_urls.extend([x + ',\n' for x in urls_])
 
-        with open('scraping_2/temp/urls.csv', 'w') as file:
-            print(f'urls.csv created at {os.getcwd()}/scraping_2/temp/urls.csv')
+        with open('scraping/temp/urls.csv', 'w') as file:
+            print(f'urls.csv created at {os.getcwd()}/scraping/temp/urls.csv')
             file.writelines(all_urls)
     else:
 
         with open(DATA_PATH) as f:
             n_rows = len(f.read().split('\n')) - 2
 
-    with open('scraping_2/temp/urls.csv') as file:
+    with open('scraping/temp/urls.csv') as file:
         all_urls = file.read().split(',\n')[:-1]
 
     # Iterar sobre urls, parsear y guardar los datos
@@ -79,4 +79,4 @@ def run(endpoint):
     
     print(f'{endpoint} SCRAPED SUCCESSFULLY')
 
-    os.remove('scraper_2/temp/urls.csv')
+    os.remove('scraper/temp/urls.csv')
