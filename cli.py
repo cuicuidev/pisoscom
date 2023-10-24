@@ -17,13 +17,6 @@ def cli():
         type = str,
         help = 'endpoint.'
         )
-    
-    train_command.add_argument(
-        '-s',
-        '--start',
-        type = int,
-        help = 'start'
-    )
 
     commit_command = subparsers.add_parser(
         name = 'commit',
@@ -45,7 +38,7 @@ def cli():
     args = parser.parse_args()
 
     if args.command == 'scrape':
-        scrape.run(args.endpoint, args.start)
+        scrape.run(args.endpoint)
     if args.command == 'commit':
         commit.run(args.filename)
     if args.command == 'reset':

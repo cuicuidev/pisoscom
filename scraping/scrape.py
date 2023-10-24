@@ -1,8 +1,7 @@
 import os
 import requests
-import requests
-import os
 import datetime
+import glob
 
 from bs4 import BeautifulSoup
 
@@ -150,10 +149,17 @@ def scrapeUrls(endpoint):
 
 
 
-def run(endpoint, start = None):
+def run(endpoint):
     print('scraping...')
 
     PROVINCE = endpoint
+
+    start = None
+
+    try:
+        size = len(glob.glob('html_content/*.html'))
+        start = size - 1
+    except: pass
 
     URL = f'https://www.pisos.com/viviendas/{PROVINCE}/'
 
