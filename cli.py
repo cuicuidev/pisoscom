@@ -1,5 +1,5 @@
 import argparse
-from scraping import scrape
+from scraping import scrape, commit, reset
 
 def cli():
     parser = argparse.ArgumentParser(description = 'Custom CLI training util commands.')
@@ -7,35 +7,47 @@ def cli():
     subparsers = parser.add_subparsers(dest = 'command')
 
     train_command = subparsers.add_parser(
-        name = 'train',
-        help = 'Trains the current model.'
+        name = 'scrape',
+        help = 'Scrapea una web de pisos.com.'
         )
     
     train_command.add_argument(
         '-e',
-        '--epochs',
-        type = int,
-        help = 'Number of epochs to train the model. 10 if not specified.'
+        '--endpoint',
+        type = str,
+        help = 'endpoint.'
         )
     
     train_command.add_argument(
         '-s',
-        '--save-interval',
+        '--start',
         type = int,
-        help = "How often the model is saved along with it's history. None if not specified."
+        help = 'start'
     )
 
+    commit_command = subparsers.add_parser(
+        name = 'commit',
+        help = 'Extrae contenido del html y guarda los datos en un csv'
+    )
 
+    commit_command.add_argument(
+        '-f',
+        '--filename',
+        type = str,
+        help = 'filename'
+    )
+    
     reset_command = subparsers.add_parser(
         name = 'reset',
-        help = 'Resets the current history.'
+        help = 'Resetea el entorno para scrapear'
     )
 
     args = parser.parse_args()
 
-    if args.command == 'train':
-        train.run(args.epochs, args.save_interval)
-    
+    if args.command == 'scrape':
+        scrape.run(args.endpoint, args.start)
+    if args.command == 'commit':
+        commit.run(args.filename)
     if args.command == 'reset':
         reset.run()
 
