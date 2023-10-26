@@ -25,6 +25,8 @@ def scrape(endpoints):
         page = browser.new_page()
 
         for endpoint in endpoints:
+            log.info(f'util.scrape | scraping {endpoint}')
+            
             log.debug(f'util.scrape | calling page.goto(endpoint, timeout = TIMEOUT) | endpoint = {endpoint} | TIMEOUT = {TIMEOUT}')
             page.goto(endpoint, timeout = TIMEOUT)
 
@@ -76,10 +78,10 @@ def scanRegions(url):
                 n_results = n_results[1:-1]
                 n_results = ''.join(n_results.split('.'))
                 n_results = int(n_results)
-            except:
-                print(f'FAIL CASTING TO INTEGER {endpoint}')
+            except Exception as e:
+                log.error(f'util.scanRegions | {type(e).__name__} | {e}')
         else:
-            print(f'n_results EMPTY {endpoint}')
+            log.debug(f'util.scanRegions | n_results empty at {endpoint}')
         #</INT>
 
         # <RECURSSION>
