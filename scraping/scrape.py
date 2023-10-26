@@ -5,11 +5,8 @@ from scraping.locations import *
 
 import numpy as np
 
-import logging as log
-
-log.basicConfig(level=log.DEBUG)
-
 def run(endpoint):
+
     log.info(f'scrape.run | scraping {endpoint}')
 
     ############################################
@@ -125,7 +122,7 @@ def run(endpoint):
             location = getLocation(soup)
             log.debug(f'scrape.run | getLocation(soup) returned')
 
-            log.debug(f'scrape.run | getLatLong(soup) returned')
+            log.debug(f'scrape.run | calling getLatLong(soup)')
             lat, long = getLatLong(soup)
             log.debug(f'scrape.run | getLatLong(soup) returned')
 
@@ -141,14 +138,20 @@ def run(endpoint):
 
             log.debug(f'scrape.run | appending to {endpoint}.csv at ./data/')
             with open(DATA_PATH, 'a+', encoding = 'utf-8') as f:
-                log.debug(f'scrape.run | appending {data}')
+                log.debug(f'scrape.run | appending data')
                 f.write(data)
 
                 log.debug(f'scrape.run | appending a line break')
                 f.write('\n')
             log.debug(f'scrape.run | done appending')
 
-    except:
+    except KeyboardInterrupt as e:
+        log.error(f'scrape.run | KeyboardInterrupt | {e}')
+        log.error(f'scrape.run | return None')
+        return
+
+    except Exception as e:
+        log.error(f'scrape.run | {type(e).__name__} | {e}') 
         log.error(f'scrape.run | loop failed, starting recursively...')
         run(endpoint)
         log.debug(f'scrape.run | return None')

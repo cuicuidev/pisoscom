@@ -6,31 +6,38 @@ import time
 from playwright.sync_api import sync_playwright
 
 from bs4 import BeautifulSoup
+from CONFIG import *
 
 base_url = 'https://www.pisos.com/'
 
 def scrape(endpoints):
 
     try: os.mkdir('html_content/')
-    except FileExistsError as e: print(e)
+    except FileExistsError as e: log.error(f'util.scrape | FileExistsError | {e}')
 
     with sync_playwright() as p:
+
+        log.debug(f'util.scrape | instantializing chromium')
         b = p.chromium
-        browser = b.launch(headless=True)
+        log.debug(f'util.scrape | calling b.launch(headless = HEADLESS) | HEADLESS = {HEADLESS}')
+        browser = b.launch(headless=HEADLESS)
+        log.debug(f'util.scrape | new page')
         page = browser.new_page()
 
         for endpoint in endpoints:
-            page.goto(endpoint, timeout = 60000)
-            print(endpoint)
+            log.debug(f'util.scrape | calling page.goto(endpoint, timeout = TIMEOUT) | endpoint = {endpoint} | TIMEOUT = {TIMEOUT}')
+            page.goto(endpoint, timeout = TIMEOUT)
 
             _prev_height = -1
             _max_scrolls = 100
             _scroll_count = 0
+            log.debug(f'util.scrape | scrolling through the page')
             while _scroll_count < _max_scrolls:
                 page.evaluate("window.scroll({ top: document.body.scrollHeight, behavior: 'smooth' });")
                 page.wait_for_timeout(1000)
                 new_height = page.evaluate("document.body.scrollHeight")
                 if new_height == _prev_height:
+                    log.debug(f'util.scrape | stopped scrolling')
                     break
                 _prev_height = new_height
                 _scroll_count += 1
@@ -45,6 +52,7 @@ def scrape(endpoints):
 
             metadata = {'timestamp' : timestamp, 'soft_url' : soft_url}
 
+            log.debug(f'util.scrape | yielding content and metadata')
             yield content, metadata
                     
         browser.close()
