@@ -43,7 +43,7 @@ def run(endpoint):
         urls = scanRegions(URL)
         log.debug(f'scrape.run | scanRegions() returned')
 
-        log.debug(f'scrape.run | calling parseRegions(urls) | urls[0]  = {urls[0]} | len(urls) = {len(urls)}')
+        log.debug(f'scrape.run | calling parseRegions(urls) | len(urls.keys()) = {len(urls.keys())}')
         urls = parseRegions(urls)
         log.debug(f'scrape.run | parseRegions() returned')
 
