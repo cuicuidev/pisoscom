@@ -8,3 +8,6 @@ __pycache__/
 .ipynb_checkpoints/
 
 chromedriver.exe
+
+logs.log
+urls.csv

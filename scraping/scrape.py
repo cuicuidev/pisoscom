@@ -4,6 +4,7 @@ from scraping.parsing import *
 from scraping.locations import *
 
 import numpy as np
+import glob
 
 def run(endpoint):
 

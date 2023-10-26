@@ -12,5 +12,5 @@ stdout.setLevel(logging.INFO)
 log.addHandler(drive)
 log.addHandler(stdout)
 
-HEADLESS = True
+HEADLESS = False
 TIMEOUT = 60_000
