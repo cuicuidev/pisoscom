@@ -55,9 +55,10 @@ def run(endpoint):
         urls = [x.replace('//viviendas/', '/venta/pisos-') for x in urls]
         log.debug(f'scrape.run | done replacing')
 
+
         log.debug(f'scrape.run | exctracting publication urls out of pages')
-        log.debug(f'scrape.run | initializing all_urls as an empty list | len(all_urls) = {len(all_urls)}')
         all_urls = []
+        log.debug(f'scrape.run | initializing all_urls as an empty list | len(all_urls) = {len(all_urls)}')
         for url in urls:
             log.debug(f'scrape.run | calling scrapeUrls(url) | url = {url}')
             urls_ = scrapeUrls(url)
