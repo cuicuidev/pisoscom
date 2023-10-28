@@ -164,5 +164,5 @@ def run(endpoint):
     log.info(f'scrape.run | {endpoint} scraped successfully')
 
     log.debug(f'scrape.run | cleaning files at ./temp/')
-    os.remove('scraper/temp/urls.csv')
+    os.remove('scraping/temp/urls.csv')
     log.debug(f'scrape.run | return None')
