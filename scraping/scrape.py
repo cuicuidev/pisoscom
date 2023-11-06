@@ -27,6 +27,14 @@ def run(endpoint):
     urls_exists = bool(len(glob.glob('scraping/temp/urls.csv')))
     log.debug(f'scrape.run | urls_exists = {urls_exists}')
 
+    if urls_exists:
+        with open("scraping/temp/urls.csv") as file:
+            target = file.readlines()[0][:-2]
+        
+        if target != endpoint:
+            log.critical(f'scrape.run | El endpoint "{target}" está a medias, no puedes scrapear el endpoint "{endpoint}"')
+            raise Exception(f'El endpoint "{target}" está a medias, no puedes scrapear el endpoint "{endpoint}"')
+
     if data_exists and not urls_exists:
         log.critical(f'scrape.run | {endpoint} has been already downloaded')
         raise Exception(f'El endpoint {endpoint} ya se descargó')
@@ -79,6 +87,7 @@ def run(endpoint):
 
         log.debug(f'scrape.run | creating urls.csv at ./temp/')
         with open('scraping/temp/urls.csv', 'w') as file:
+            file.write(endpoint + ',\n')
             file.writelines(all_urls)
         log.debug(f'scrape.run | urls.csv created at ./temp/')
 
@@ -94,7 +103,7 @@ def run(endpoint):
     log.debug(f'scrape.run | reading urls.csv at ./temp/')
     with open('scraping/temp/urls.csv') as file:
         log.debug(f'scrape.run | getting all_urls from urls.csv')
-        all_urls = file.read().split(',\n')[:-1]
+        all_urls = file.read().split(',\n')[1:-1]
     log.debug(f'scrape.run | done reading')
 
     # Iterar sobre urls, parsear y guardar los datos
