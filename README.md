@@ -10,3 +10,8 @@ Para scrapear una pagina (los datos se guardan en `scraping/data/`)
 ```sh
 python cli.py scrape -e 'endpoint'
 ```
+
+Para ver qué endpoints faltan por scrapear
+```sh
+python cli.py check
+```
