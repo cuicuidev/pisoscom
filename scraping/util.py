@@ -52,6 +52,12 @@ def scrape(urls):
                 log.debug(f'util.scrape | is_at_bottom = {is_at_bottom} | break')
                 break
             
+            try:
+                if browser.find_element(By.XPATH, '//*[@id="location"]/script[2]'):
+                    log.debug(f'util.scrape | found lat and lng script | break')
+                    break
+            except: pass
+
             log.debug(f'util.scrape | scrolling...')
             browser.execute_script("window.scroll({ top: document.body.scrollHeight, behavior: 'smooth' });")
             log.debug(f'util.scrape | calling sleep(0.2)')
