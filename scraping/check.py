@@ -10,5 +10,7 @@ def run(args):
 
     remaining_endpoints = [x for x in all_endpoints if x not in scraped_endpoints]
 
+    remaining_endpoints = [x for x in remaining_endpoints if 'pisos-' not in x]
+
     for endpoint in remaining_endpoints:
         print(endpoint)
