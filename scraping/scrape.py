@@ -114,8 +114,18 @@ def run(endpoint):
     else:
         to_scrape = all_urls
 
+    n_urls = len(to_scrape)
+
+    eta_seconds = n_urls * 3
+
+    eta_h = eta_seconds // 3600
+    eta_m = (eta_seconds // 60) % 60
+    eta_s = eta_seconds % 60
+
+
     try:
         log.debug(f'scrape.run | looping through scrape(to_scrape) | to_scrape[0] = {to_scrape[0]} | len(to_scrape) = {len(to_scrape)}')
+        log.info(f'scrape.run | scraping {n_urls} urls | estimated time to completion {eta_h}h {eta_m}m {eta_s}s')
         for html, metadata in scrape(to_scrape):
 
             log.debug(f'scrape.run | instantializing BeautifulSoup object')
