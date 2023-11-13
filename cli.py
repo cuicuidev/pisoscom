@@ -18,6 +18,12 @@ def cli():
         help = 'endpoint.'
         )
     
+    train_command.add_argument(
+        '-p',
+        action = 'store_true',
+        help = 'Marca el enlace como `/venta/pisos-`'
+    )
+    
     check_command = subparsers.add_parser(
         name = 'check',
         help = 'Comprueba qué endpoints faltan por scrapear'
@@ -26,7 +32,7 @@ def cli():
     args = parser.parse_args()
 
     if args.command == 'scrape':
-        scrape.run(args.endpoint)
+        scrape.run(args.endpoint, args.p)
 
     if args.command == 'check':
         check.run(args)

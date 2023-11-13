@@ -192,6 +192,7 @@ def parseRegions(endpoints):
     return array
 
 def scrapeUrls(endpoint):
+    log.debug(f'util.scrapeUrls | request to {endpoint}')
     response = requests.get(endpoint)
 
     soup = BeautifulSoup(response.text, 'html.parser')
@@ -200,11 +201,15 @@ def scrapeUrls(endpoint):
 
     n_results = int(''.join([x for x in results if x.isnumeric()]))
     n_pages = (n_results // 30) + 1
+    
+    log.debug(f'util.scrapeUrls | {n_pages=}')
 
     urls = []
     for i in range(n_pages):
         url = f'{endpoint}{i + 1}'
         response = requests.get(url)
+        
+        log.debug(f'util.scrapeUrls | {url} | {response.status_code=}')
 
         soup = BeautifulSoup(response.text, 'html.parser')
 

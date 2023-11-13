@@ -6,9 +6,13 @@ from scraping.locations import *
 import numpy as np
 import glob
 
-def run(endpoint):
+def run(endpoint, p):
 
     log.info(f'scrape.run | scraping {endpoint}')
+
+    if p:
+        run_p(endpoint)
+        return
 
     ############################################
 
@@ -179,6 +183,138 @@ def run(endpoint):
         return
 
     ############################################
+    
+    log.info(f'scrape.run | {endpoint} scraped successfully')
+
+    log.debug(f'scrape.run | cleaning files at ./temp/')
+    os.remove('scraping/temp/urls.csv')
+    log.debug(f'scrape.run | return None')
+
+
+def run_p(endpoint):
+
+    DATA_PATH = f'scraping/data/{endpoint}.csv'
+
+    log.debug(f'scrape.run | checking if {endpoint}.csv exists at ./data/')
+    data_exists = bool(len(glob.glob(DATA_PATH)))
+    log.debug(f'scrape.run | data_exists = {data_exists}')
+
+    log.debug('scrape.run | checking if urls.csv exists at ./temp/')
+    urls_exists = bool(len(glob.glob('scraping/temp/urls.csv')))
+    log.debug(f'scrape.run | urls_exists = {urls_exists}')
+
+    if urls_exists:
+        with open("scraping/temp/urls.csv") as file:
+            target = file.readlines()[0][:-2]
+        
+        if target != endpoint:
+            log.critical(f'scrape.run | El endpoint "{target}" está a medias, no puedes scrapear el endpoint "{endpoint}"')
+            raise Exception(f'El endpoint "{target}" está a medias, no puedes scrapear el endpoint "{endpoint}"')
+
+    if data_exists and not urls_exists:
+        log.critical(f'scrape.run | {endpoint} has been already downloaded')
+        raise Exception(f'El endpoint {endpoint} ya se descargó')
+
+    n_rows = 0
+
+
+    if not data_exists:
+
+            with open(DATA_PATH, 'w', encoding = 'utf-8') as f:
+                f.write('price,title,province,location,lat,lng,characteristics,agency,updated,numeric_data\n')
+
+            urls = scrapeUrls(f'https://www.pisos.com/venta/{endpoint}/')
+
+            all_urls = ['https://www.pisos.com' + x + ',\n' for x in urls]
+
+            with open('scraping/temp/urls.csv', 'w') as file:
+                file.write(endpoint + ',\n')
+                file.writelines(all_urls)
+
+    else:
+
+        log.debug(f'scrape.run | reading {endpoint}.csv at ./data/')
+        with open(DATA_PATH, encoding = 'utf-8') as f:
+            log.debug(f'scrape.run | calculating n_rows')
+            n_rows = len(f.read().split('\n')) - 2
+            log.debug(f'scrape.run | n_rows = {n_rows}')
+        log.debug(f'scrape.run | done reading')
+
+    log.debug(f'scrape.run | reading urls.csv at ./temp/')
+    with open('scraping/temp/urls.csv') as file:
+        log.debug(f'scrape.run | getting all_urls from urls.csv')
+        all_urls = file.read().split(',\n')[1:-1]
+    log.debug(f'scrape.run | done reading')
+
+    # Iterar sobre urls, parsear y guardar los datos
+
+    if n_rows != 0:
+        log.debug(f'scrape.run | slicing all_urls at [{n_rows -1}:]')
+        to_scrape = all_urls[n_rows - 1:]
+    else:
+        to_scrape = all_urls
+
+    n_urls = len(to_scrape)
+
+    eta_seconds = n_urls * 3
+
+    eta_h = eta_seconds // 3600
+    eta_m = (eta_seconds // 60) % 60
+    eta_s = eta_seconds % 60
+
+
+    try:
+        for html, metadata in scrape(to_scrape):
+
+            log.debug(f'scrape.run | instantializing BeautifulSoup object')
+            soup = BeautifulSoup(html, 'html.parser')
+
+            log.debug(f'scrape.run | calling getPrice(soup)')
+            price = getPrice(soup)
+            log.debug(f'scrape.run | getPrice() returned')
+
+            log.debug(f'scrape.run | calling getTitle(soup)')
+            title = getTitle(soup)
+            log.debug(f'scrape.run | getTitle(soup) returned')
+
+            log.debug(f'scrape.run | calling getLocation(soup)')
+            location = getLocation(soup)
+            log.debug(f'scrape.run | getLocation(soup) returned')
+
+            log.debug(f'scrape.run | calling getLatLong(soup)')
+            lat, long = getLatLong(soup)
+            log.debug(f'scrape.run | getLatLong(soup) returned')
+
+            log.debug(f'scrape.run | calling getCharacteristics(soup)')
+            characteristics = getCharacteristics(soup)
+            log.debug(f'scrape.run | getCharacteristics(soup) returned')
+
+            log.debug(f'scrape.run | calling getAgencyDate(soup)')
+            updated, agency = getAgencyDate(soup)
+            log.debug(f'scrape.run | getAgencyDate(soup) returned')
+
+            data = f'{price},{title},{location},{lat},{long},{characteristics},{agency},{updated},{metadata}'
+
+            log.debug(f'scrape.run | appending to {endpoint}.csv at ./data/')
+            with open(DATA_PATH, 'a+', encoding = 'utf-8') as f:
+                log.debug(f'scrape.run | appending data')
+                f.write(data)
+
+                log.debug(f'scrape.run | appending a line break')
+                f.write('\n')
+            log.debug(f'scrape.run | done appending')
+
+    except KeyboardInterrupt as e:
+        log.error(f'scrape.run | KeyboardInterrupt | {e}')
+        log.error(f'scrape.run | return None')
+        return
+
+    except Exception as e:
+        log.error(f'scrape.run | {type(e).__name__} | {e}') 
+        log.error(f'scrape.run | loop failed, starting recursively...')
+        run_p(endpoint)
+        log.debug(f'scrape.run | return None')
+        return
     
     log.info(f'scrape.run | {endpoint} scraped successfully')
 
