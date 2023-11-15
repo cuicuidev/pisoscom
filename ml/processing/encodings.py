@@ -1,6 +1,6 @@
 import pandas as pd
 
-def targetEncoding(df, target, condition):
+def targetEncoding(df: pd.DataFrame, target: pd.Series, condition: str) -> tuple:
     """
     Recibe un DataFrame categórico df, una Serie target y una string condition.
     Retorna df con las categorías cambiadas a la mediana o el promedio de la serie target, dependiendo de condition.
