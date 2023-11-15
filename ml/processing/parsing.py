@@ -142,3 +142,76 @@ def getStreetType(df):
 #     df['street'] = street
     
 #     return df
+
+def read_csv(path: str) -> pd.DataFrame:
+    with open(path, encoding = 'utf-8') as file:
+        data = file.readlines()
+        
+    pattern_dict = r'\{([^}]+)\}' #patrón para detectar diccionarios
+    pattern_list = r'\[([^]]+)\]' #patrón para detectar listas
+
+    df = pd.DataFrame(columns=['price', 'title_location', 'lat', 'lng', 'province', 'last_updated', 'agency', 'characteristics', 'meta_data'])
+    
+    for row in data[1:]:
+        new_row = {}
+
+        match = re.findall(pattern_dict, row) # buscamos cualquier cosa que parezca un diccionario
+        if len(match) == 0:
+            new_row['meta_data'] = np.nan
+            row = row[:- 3]
+        else:
+            new_row['meta_data'] = ast.literal_eval('{' + match[-1] + '}') # parseamos el diccionario
+
+            row = row[:- 4 -len(match[-1])] # borramos la representación del diccionario de meta_data
+        row = row.split(',') # separamos por coma
+        
+        new_row['last_updated'] = row.pop() # sacamos la columna last_updated
+        new_row['agency'] = row.pop() # sacamos la columna agency
+
+        row = ','.join(row) # juntamos con comas
+
+        match = re.findall(pattern_list, row) # buscamos cualquier cosa que parezca una lista
+
+        try:
+            if len(match) == 0:
+                new_row['characteristics'] = np.nan
+            else:
+                new_row['characteristics'] = ast.literal_eval('[' + match[-1] + ']') # parseamos la lista
+        except:
+            new_row['characteristics'] = np.nan
+
+        try:
+            row = row[:- 4 -len(match[0])] # borramos la representación de la lista
+        except:
+            row = row[:-3]
+
+        row = row.split(',') # separamos por coma
+
+        new_row['lng'] = row.pop() # sacamos columna de longutud
+        new_row['lat'] = row.pop() # sacamos columna de latitud
+        new_row['price'] = row.pop(0) # sacamos la columna de precio
+
+        new_row['title_location'] = ','.join(row) # sacamos titulo y calle (hay comas molestando, no sé como separar bien las dos columnas)
+        
+        new_row['province'] = path
+
+        df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+
+    return df
+
+def tryNan(x):
+    if pd.isna(x):
+        return np.nan
+    if 'consultar' in x:
+        return np.nan
+    
+    try:
+        return int(''.join(x[:-2].split('.')))
+    except:
+        return np.nan
+    
+def tryFloat(x):
+    try:
+        return float(x)
+    except:
+        return np.nan
