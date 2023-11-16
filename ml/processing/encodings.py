@@ -21,7 +21,7 @@ def targetEncoding(df: pd.DataFrame, target: pd.Series, condition: str) -> tuple
             
     return df_target, encodings_map
 
-def frequencyEncoding(df):
+def frequencyEncoding(df: pd.DataFrame):
     """
     Recibe un DataFrame categórico df.
     Retorna df con las categorías cambiadas a la frecuencia con la que aparecen.
@@ -36,7 +36,7 @@ def frequencyEncoding(df):
         encodings_map[column] = encode
     return df_frequency, encodings_map
 
-def outliersFilter(df, min_price, max_price, max_baths, max_surface):
+def outliersFilter(df: pd.DataFrame, min_price: float, max_price: float, max_baths: float, max_surface: float):
     """
     Recibe un DataFrame df, los máximos y mínimos de price, el máximo de bathrooms y el máximo de surface.
     Retorna df con los outliers filtrados de acuerdo a los parámetros indicados.
@@ -46,7 +46,7 @@ def outliersFilter(df, min_price, max_price, max_baths, max_surface):
     df = df[df['surface']<=max_surface]
     return df
 
-def binaryEncoding(df):
+def binaryEncoding(df: pd.DataFrame):
     """
     Recibe un DataFrame df.
     Retorna df con las catergorías cambiadas a binario.
@@ -57,4 +57,16 @@ def binaryEncoding(df):
     df['publisher'] = df['publisher'].apply(lambda x: 1 if x == 'inmobiliaria' else 0)
     return df
 
-
+def getSample(df: pd.DataFrame, perc: float):
+    """
+    Recibe un DataFrame df y un porcentaje perc.
+    Retorna un DataFrame df_sample para validación con al menos un dato por cada provincia.
+    """
+    df_sample = pd.DataFrame(columns = df.columns)
+    for province in df['province'].unique():
+        df_prov_sample = df[df['province'] == province]
+        if len(df_prov_sample) < 2:
+            continue
+        df_prov_sample = df_prov_sample.sample(round(df_prov_sample.shape[0]*perc), random_state=42)
+        df_sample = pd.concat([df_sample, df_prov_sample], axis=0)
+    return df_sample
