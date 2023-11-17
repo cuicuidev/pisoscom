@@ -59,8 +59,8 @@ def binaryEncoding(df: pd.DataFrame):
 
 def getSample(df: pd.DataFrame, perc: float):
     """
-    Recibe un DataFrame df y un porcentaje perc.
-    Retorna un DataFrame df_sample para validación con al menos un dato por cada provincia.
+    Recibe un DataFrame 'df' y un porcentaje 'perc'.
+    Retorna un DataFrame df_sample para validación.
     """
     df_sample = pd.DataFrame(columns = df.columns)
     for province in df['province'].unique():
