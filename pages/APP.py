@@ -3,6 +3,8 @@ from streamlit_lottie import st_lottie
 import requests
 import pickle
 import numpy as np
+import pandas as pd
+import glob
 
 def app():
 
@@ -13,8 +15,13 @@ def app():
     
     #st.write('<div style="text-align: justify;"> Escoge las características de tu vivienda en Madrid para obtener un precio .</div>', unsafe_allow_html=True)  
 
+
+    df_provincias=pd.read_parquet('ml/processed_data/tatarabuela.parquet')
+    lista_provincias=list(df_provincias.province.unique())
+
+
     #Elección de cuidad
-    Cuidad=st.sidebar.selectbox("Elige tu ciudad",["MADRID","A CORUÑA"])
+    Cuidad=st.sidebar.selectbox("Elige tu ciudad",lista_provincias) #Lista de cidades en prceso
 
     # Slider de selección m2.
     m_cuad=st.sidebar.slider("Selecciona los metros cuadrados de tu vivienda:", min_value=0, max_value=300, value=75, step=1)    
@@ -34,33 +41,50 @@ def app():
     cert=st.sidebar.selectbox("Selecciona si tiene el certificado energético:", Clasificacion)
     
 
-    with open('model_test.pkl', 'rb') as file:
-        modelo = pickle.load(file)
+    m_25 = False
+    #province = request_form.province
 
-    lat=40.5934447
-    lng=-4.1453858
+    model_paths = glob.glob("ml/models/*.pkl")
+    model_path = [path for path in model_paths if Cuidad in path]
+
+    if len(model_path) == 0:
+        model_path = 'ml/models/model_25.pkl'
+        m_25=True
+    else:
+        model_path = model_path[0]
+    
+    with open(model_path, 'br') as file:
+        model = pkl.load(file)
+
+    del file
+
+    # with open('model_test.pkl', 'rb') as file:
+    #     modelo = pickle.load(file)
+
+    # lat=40.5934447
+    # lng=-4.1453858
     
    
-    model=[lat,lng,baños,hab,m_cuad]
+    # model=[lat,lng,baños,hab,m_cuad]
 
-    if est_cons == "A Estrenar":
-        model.extend([0,0,0])
+    # if est_cons == "A Estrenar":
+    #     model.extend([0,0,0])
 
-    elif est_cons == "En Buen estado":
-        model.extend([1,0,0])
+    # elif est_cons == "En Buen estado":
+    #     model.extend([1,0,0])
 
-    elif est_cons == "A Reformar":
-        model.extend([0,1,0])
+    # elif est_cons == "A Reformar":
+    #     model.extend([0,1,0])
 
-    elif est_cons == "Reformado":
-        model.extend([0,0,1])
-    else:
-        model.extend([0,0,0])
+    # elif est_cons == "Reformado":
+    #     model.extend([0,0,1])
+    # else:
+    #     model.extend([0,0,0])
 
     
 
-    modelu=modelo.predict([model])
-    modelu_round2=np.round(modelu, 2)
+    # modelu=modelo.predict([model])
+    # modelu_round2=np.round(modelu, 2)
     
 
     
