@@ -1,7 +1,7 @@
 import streamlit as st
 from streamlit_lottie import st_lottie
 import requests
-import pickle as pkl as pkl
+import pickle as pkl
 import numpy as np
 import pandas as pd
 import glob
@@ -55,19 +55,8 @@ def app():
 
     est_cons=st.sidebar.selectbox("Selecciona el estado de conservación de la vivienda:", lista_estados)
 
-    # Slider de selección Clasificación.
-    Clasificacion= ['En trámite','No indicado','Disponible','Pendiente de completar','Exento']
-    cert=st.sidebar.selectbox("Selecciona si tiene el certificado energético:", Clasificacion)
-
-    # Slider de selección Clasificación.
-    lat=st.number_input('Introduce Latitud', min_value=0.00, max_value=100.00, value=40.31, step=0.01)
-    lng=st.number_input('Introduce Longitud', min_value=0.00, max_value=100.00, value=48.54, step=0.01)
-
-    #cert=st.sidebar.selectbox("Selecciona si tiene el certificado energético:", Clasificacion)
-    
 
     m_25 = False
-    #province = request_form.province
 
     model_paths = glob.glob("ml/models/*.pkl")
     model_data = [path for path in model_paths if province in path]
@@ -109,12 +98,10 @@ def app():
     
     del file
 
-    surface = m_cuad
-    bathrooms = baños
     rooms = hab
     garden = False
     age = 20
-    useful_surface = m_cuad*0.85
+    useful_surface = surface*0.85
     elevator = True
     garage = True
     state = encodings['state'][est_cons]
@@ -126,42 +113,12 @@ def app():
         y_test = [[lat, lng, surface, bathrooms, province, rooms, garden, age, useful_surface, elevator, garage, state]]
 
     st.write(f'Predicción {model.predict(y_test)=}')
-
-
-    
-   
-    # model=[lat,lng,baños,hab,m_cuad]
-
-    # if est_cons == "A Estrenar":
-    #     model.extend([0,0,0])
-
-    # elif est_cons == "En Buen estado":
-    #     model.extend([1,0,0])
-
-    elif state == "A Reformar":
-        model.extend([0,1,0])
-
-    elif state == "Reformado":
-        model.extend([0,0,1])
-    else:
-        model.extend([0,0,0])
-
     
     if m_25:
-        model_param=[price, lat, lng, surface, bathrooms, province, rooms, garden, age, useful_surface, elevator, garage, state]
+        model_param=[lat, lng, surface, bathrooms, province, rooms, garden, age, useful_surface, elevator, garage, state]
     else:
-        model_param= [price, lat, lng, surface, bathrooms, rooms, garden, age, useful_surface, elevator, garage, state]
+        model_param= [lat, lng, surface, bathrooms, rooms, garden, age, useful_surface, elevator, garage, state]
 
-    
-
-    
-
-    modelu=model.predict([model_param])
-    modelu_round2=np.round(modelu, 2)
-    
-
-    
-    # st.markdown(f"<h1 style='text-align: center; font-size: 48px;'> SU VIVENDA TIENE UN VALOR DE MERCADO DE: {modelu_round2[0]}€ </h1>", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     app()
