@@ -1,7 +1,7 @@
 import streamlit as st
 from streamlit_lottie import st_lottie
 import requests
-import pickle
+import pickle as pkl
 import numpy as np
 import pandas as pd
 import glob
@@ -21,24 +21,30 @@ def app():
 
 
     #Elección de cuidad
-    Cuidad=st.sidebar.selectbox("Elige tu ciudad",lista_provincias) #Lista de cidades en prceso
+    province=st.sidebar.selectbox("Elige tu ciudad",lista_provincias) #Lista de cidades en prceso
 
     # Slider de selección m2.
-    m_cuad=st.sidebar.slider("Selecciona los metros cuadrados de tu vivienda:", min_value=0, max_value=300, value=75, step=1)    
+    surface=st.sidebar.slider("Selecciona los metros cuadrados de tu vivienda:", min_value=0, max_value=300, value=75, step=1)    
         
     # Slider de selección habitaciones.
     hab=st.sidebar.slider("Selecciona las habitaciones de tu vivienda:", min_value=0, max_value=5, value=2, step=1)    
         
     # Slider de selección baños.
-    baños=st.sidebar.slider("Selecciona los baños de tu vivienda:", min_value=0, max_value=3, value=2, step=1)
+    bathrooms=st.sidebar.slider("Selecciona los baños de tu vivienda:", min_value=0, max_value=3, value=2, step=1)
 
     # Slider de selección Conservación.
-    Conservacion = ["A Estrenar", "En Buen estado", "A Reformar", "Reformado"]
+    state = ["A Estrenar", "En Buen estado", "A Reformar", "Reformado"]
     est_cons=st.sidebar.selectbox("Selecciona el estado de conservación de la vivienda:", Conservacion)
 
     # Slider de selección Clasificación.
     Clasificacion= ['En trámite','No indicado','Disponible','Pendiente de completar','Exento']
     cert=st.sidebar.selectbox("Selecciona si tiene el certificado energético:", Clasificacion)
+
+    # Slider de selección Clasificación.
+    lat=st.number_input('Introduce Latitud', min_value=0.00, max_value=100.00, value=40.31, step=0.01)
+    lng=st.number_input('Introduce Longitud', min_value=0.00, max_value=100.00, value=48.54, step=0.01)
+
+    #cert=st.sidebar.selectbox("Selecciona si tiene el certificado energético:", Clasificacion)
     
 
     m_25 = False
@@ -63,28 +69,33 @@ def app():
 
     # lat=40.5934447
     # lng=-4.1453858
-    
-   
-    # model=[lat,lng,baños,hab,m_cuad]
 
-    # if est_cons == "A Estrenar":
-    #     model.extend([0,0,0])
 
-    # elif est_cons == "En Buen estado":
-    #     model.extend([1,0,0])
+    if state == "A Estrenar":
+        model.extend([0,0,0])
+    elif state == "En Buen estado":
+        model.extend([1,0,0])
 
-    # elif est_cons == "A Reformar":
-    #     model.extend([0,1,0])
+    elif state == "A Reformar":
+        model.extend([0,1,0])
 
-    # elif est_cons == "Reformado":
-    #     model.extend([0,0,1])
-    # else:
-    #     model.extend([0,0,0])
+    elif state == "Reformado":
+        model.extend([0,0,1])
+    else:
+        model.extend([0,0,0])
 
     
+    if m_25:
+        model_param=[price, lat, lng, surface, bathrooms, province, rooms, garden, age, useful_surface, elevator, garage, state]
+    else:
+        model_param= [price, lat, lng, surface, bathrooms, rooms, garden, age, useful_surface, elevator, garage, state]
 
-    # modelu=modelo.predict([model])
-    # modelu_round2=np.round(modelu, 2)
+    
+
+    
+
+    modelu=model.predict([model_param])
+    modelu_round2=np.round(modelu, 2)
     
 
     
