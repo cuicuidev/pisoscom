@@ -9,5 +9,3 @@ chromedriver.exe
 
 logs.log
 urls.csv
-
-*.pkl
