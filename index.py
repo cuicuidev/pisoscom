@@ -1,19 +1,15 @@
 #Importamos las librerias necesarias.
 import streamlit as st
-import pandas as pd
-import matplotlib as plt
-import plotly.express as px
 from streamlit_lottie import st_lottie  #Libreria necesaria para trabajar con lotties archivos json animados
-import requests
 from streamlit_option_menu import option_menu    #Libreria necesaria para trabajar con lotties archivos json animados
-from datetime import date,datetime
-import sklearn
 
 #Importamos funciones de codigo en otros archivos
 # from intro import introduccion
 # from eda import eda1
-from pages.Autores import Autores
-from pages.APP import app
+# from pages.Autores import Autores
+# from pages.APP import app
+from pages import APP
+from pages import Autores
 
 # Cargamos los DataFrames necesarios para el proyecto. Tengo todos los del EDA.
 
@@ -29,6 +25,7 @@ def main():
 
     st.set_page_config(
     page_title="Property Price Predictor",
+    page_icon=":house:"
     )
 
     # Creamos un MENÚ.
@@ -43,7 +40,7 @@ def main():
     #################################################################################################
 
     if opcion == 'APP':
-        app()
+        APP.app()
 
         
 
@@ -52,7 +49,7 @@ def main():
     ################################################################################################
 
     elif opcion == 'AUTORES':  
-        Autores()
+        Autores.Autores()
 
     ############################# CARGAMOS IMÁGENES Y PIE  DE PÁGINA #######################
     ###############################################################################################

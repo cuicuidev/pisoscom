@@ -2,25 +2,14 @@ import streamlit as st
 from streamlit_lottie import st_lottie
 import requests
 import pickle as pkl
+import json
 import numpy as np
 import pandas as pd
 import glob
 import streamlit as st
 from streamlit_folium import st_folium
 import folium
-import geopandas as gpd
-from shapely.geometry import Point
-
-def getProvince(latitude, longitude):
-    # Cargar el archivo GeoJSON en un GeoDataFrame
-    gdf = gpd.read_file('provincias-espanolas.geojson')
-    # Crear un objeto Point con las coordenadas dadas
-    point = Point(longitude, latitude)
-    # Iterar sobre las filas del GeoDataFrame y verificar si el punto está dentro de alguna provincia
-    for index, row in gdf.iterrows():
-        if point.within(row['geometry']):
-            return row['provincia']
-    return 'Fail'
+from . import functions
 
 def app():
 
@@ -30,52 +19,54 @@ def app():
     st_lottie(requests.get("https://lottie.host/ecc8a4d4-40c8-44ce-933f-1ca4c3041220/0XipcxeEJL.json").json(), height=250, key="Into1")
     
     #st.write('<div style="text-align: justify;"> Escoge las características de tu vivienda en Madrid para obtener un precio .</div>', unsafe_allow_html=True)  
-
     
-    
-    lat, lng = 35.782170703266075, -8.041992187500002 # Localiza el centro del mapa que vamos a mostrar
+    with open('province_translate.json', 'r') as file:
+        province_translate = json.load(file)
 
-    m = folium.Map(location=(lat, lng), zoom_start=5)
+    selected_province=st.sidebar.selectbox("Provincia", sorted([x for x in set(province_translate.values()) if x is not None]))
+    
+    # lat, lng = 35.782170703266075, -8.041992187500002 # Localiza el centro del mapa que vamos a mostrar
+    lat, lng = functions.getCoordinates(selected_province)
+
+    m = folium.Map(location=(lat, lng), zoom_start=8)
     last_clicked = st_folium(m, width=725)['last_clicked']
 
     if last_clicked:
         lat, lng = last_clicked['lat'], last_clicked['lng']
-
+    
     st.write(f'{lat = :.6f}, {lng = :.6f}')
 
     df_provincias=pd.read_parquet('ml/processed_data/tatarabuela.parquet')
-    lista_provincias=list(df_provincias.province.unique())
-    df_25 = pd.read_parquet('ml/processed_data/provinces/data_25.parquet')
-    lista_estados = list(df_25.state.unique())
+    # lista_provincias=list(df_provincias.province.unique())
+    df_30 = pd.read_parquet('ml/processed_data/provinces/data_30.parquet')
+    lista_estados = sorted([x for x in df_30.state.unique() if x is not None])
 
     df_journal = pd.read_csv('ml/models/journal.csv')
     df_journal = df_journal[df_journal.stage == 'validation']
 
     del df_provincias
-    del df_25
+    del df_30
 
     # Elección de provincia
     # province=st.sidebar.selectbox("Elige tu ciudad",lista_provincias) # Cambiar por la función getprovince()
-    province = getProvince(lat, lng)
+    province = functions.getProvince(lat, lng)
     st.write(f'LA PROVINCIA ELEGIDA ES: {province}')
     if province == 'Fail':
         st.write('Haz click en una ubicacación perteneciente a España.')
 
     # Slider de selección m2.
-    surface=st.sidebar.slider("Selecciona los metros cuadrados de tu vivienda:", min_value=0, max_value=300, value=75, step=1)    
+    surface=st.sidebar.slider("Selecciona los metros cuadrados de tu vivienda:", min_value=25, max_value=1_000, value=75, step=5)    
         
     # Slider de selección habitaciones.
-    hab=st.sidebar.slider("Selecciona las habitaciones de tu vivienda:", min_value=0, max_value=5, value=2, step=1)    
+    hab=st.sidebar.slider("Selecciona las habitaciones de tu vivienda:", min_value=0, max_value=10, value=2, step=1)    
         
     # Slider de selección baños.
-    bathrooms=st.sidebar.slider("Selecciona los baños de tu vivienda:", min_value=0, max_value=3, value=2, step=1)
+    bathrooms=st.sidebar.slider("Selecciona los baños de tu vivienda:", min_value=1, max_value=5, value=1, step=1)
 
     # Slider de selección Conservación.
-
     est_cons=st.sidebar.selectbox("Selecciona el estado de conservación de la vivienda:", lista_estados)
 
-
-    m_25 = False
+    m_30 = False
 
     model_paths = glob.glob("ml/models/*.pkl")
     model_data = [path for path in model_paths if province in path]
@@ -83,12 +74,12 @@ def app():
     st.write(model_data)
 
     if len(model_data) == 0:
-        model_path = 'ml/models/model_25.pkl'
-        model_path_no_outliers = 'ml/models/model_25_no_outliers.pkl'
+        model_path = 'ml/models/model_30.pkl'
+        model_path_no_outliers = 'ml/models/model_30_no_outliers.pkl'
 
-        model_encodings = 'ml/models/model_25_encodings.pkl'
-        model_encodings_no_outliers = 'ml/models/model_25_no_outliers_encodings.pkl'
-        m_25=True
+        model_encodings = 'ml/models/model_30_encodings.pkl'
+        model_encodings_no_outliers = 'ml/models/model_30_no_outliers_encodings.pkl'
+        m_30=True
     else:
         model_path = [path for path in model_data if 'encodings' not in path and 'outliers' not in path][0]
         model_path_no_outliers = [path for path in model_data if 'encodings' not in path and 'outliers' in path][0]
@@ -125,15 +116,22 @@ def app():
     garage = True
     state = encodings['state'][est_cons]
 
-    if not m_25:
+    if not m_30:
         y_test = [[lat, lng, surface, bathrooms, rooms, garden, age, useful_surface, elevator, garage, state]]
     else:
         province = encodings['province'][province]
         y_test = [[lat, lng, surface, bathrooms, province, rooms, garden, age, useful_surface, elevator, garage, state]]
 
-    st.write(f'Predicción {model.predict(y_test)=}')
+    # Cambiamos la predicción a un formato de número que se lea fácil (miles y millones)
+    # st.write(f'Predicción {model.predict(y_test)=}')
+    predict_value = str(round(model.predict(y_test)[0]))
+    if len(predict_value) <= 6:
+        predict_value = predict_value[:-3] + '.' + predict_value[-3:]
+    else:
+        predict_value = predict_value[:-6] + '.' + predict_value[-6:-3] + '.' + predict_value[-3:]
+    st.write(f'El valor de la vivienda es de: {predict_value}€')
     
-    if m_25:
+    if m_30:
         model_param=[lat, lng, surface, bathrooms, province, rooms, garden, age, useful_surface, elevator, garage, state]
     else:
         model_param= [lat, lng, surface, bathrooms, rooms, garden, age, useful_surface, elevator, garage, state]
@@ -141,3 +139,9 @@ def app():
 
 if __name__ == "__main__":
     app()
+    
+    
+    
+    
+    
+# HAY QUE TERMINAR DE CORRELACIONAR LA ELECCIÓN DE LA PROVINCIA CON EL MODELO USADO
