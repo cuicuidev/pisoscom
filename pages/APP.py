@@ -8,6 +8,19 @@ import glob
 import streamlit as st
 from streamlit_folium import st_folium
 import folium
+import geopandas as gpd
+from shapely.geometry import Point
+
+def getProvince(latitude, longitude):
+    # Cargar el archivo GeoJSON en un GeoDataFrame
+    gdf = gpd.read_file('provincias-espanolas.geojson')
+    # Crear un objeto Point con las coordenadas dadas
+    point = Point(longitude, latitude)
+    # Iterar sobre las filas del GeoDataFrame y verificar si el punto está dentro de alguna provincia
+    for index, row in gdf.iterrows():
+        if point.within(row['geometry']):
+            return row['provincia']
+    return 'Fail'
 
 def app():
 
@@ -18,7 +31,7 @@ def app():
     
     #st.write('<div style="text-align: justify;"> Escoge las características de tu vivienda en Madrid para obtener un precio .</div>', unsafe_allow_html=True)  
 
-    lat, lng = 35.782170703266075, -8.041992187500002
+    lat, lng = 35.782170703266075, -8.041992187500002 # Localiza el centro del mapa que vamos a mostrar
 
     m = folium.Map(location=(lat, lng), zoom_start=5)
     last_clicked = st_folium(m, width=725)['last_clicked']
@@ -39,8 +52,12 @@ def app():
     del df_provincias
     del df_25
 
-    #Elección de cuidad
-    province=st.sidebar.selectbox("Elige tu ciudad",lista_provincias) #Lista de cidades en prceso
+    #Elección de provincia
+    # province=st.sidebar.selectbox("Elige tu ciudad",lista_provincias) # Cambiar por la función getprovince()
+    province = getProvince(lat, lng)
+    st.write(f'LA PROVINCIA ELEGIDA ES: {province}')
+    if province == 'Fail':
+        st.write('Debe hacer click en una ubicacación perteneciente a España.')
 
     # Slider de selección m2.
     surface=st.sidebar.slider("Selecciona los metros cuadrados de tu vivienda:", min_value=0, max_value=300, value=75, step=1)    
