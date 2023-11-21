@@ -3,12 +3,13 @@ import streamlit as st
 def Autores():
     st.title('AUTORES:') 
         
-        #Establecemos columnas para dar orden a los autores.
+    #Establecemos columnas para dar orden a los autores.
     col1, col2 = st.columns([1, 1])
     col3, col4,col5,col6 = st.columns([1, 1, 1, 1])
     col7, col8 , col9= st.columns([1, 1, 1])
     col9, col10,col11,col12, col13, col14 = st.columns([1, 1, 1, 1,1,1]) 
-        #Autores:
+    
+    #Autores:
     col1.subheader('DIMITRI') 
     col1.image('Foto/Dimitri.jpg',width=150)
     # [<img src="URL_de_la_imagen" width="200" height="100">](URL_del_enlace)
