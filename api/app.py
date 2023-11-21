@@ -81,6 +81,9 @@ class RequestForm(BaseModel):
 
     drop_outliers: bool
 
+class RequestFormMany(BaseModel):
+    data: list[RequestForm]
+
 class Prediction(BaseModel):
     price: float
     # r2_score: float
@@ -89,6 +92,9 @@ class Prediction(BaseModel):
     # val_r2_score: float
     # val_mae: float
     # val_mse: float
+
+class PredictionMany(BaseModel):
+    predictions: list[Prediction]
 
 app = FastAPI()
 
@@ -155,8 +161,22 @@ async def root() -> dict:
             'Timestamp' : datetime.datetime.now().timestamp()
             }
 
-@app.post('/predict')
-async def post_predict(request_form: RequestForm) -> Prediction:
+@app.post('/predict_one')
+async def post_predict_one(request_form: RequestForm) -> Prediction:
     data = request_form.model_dump()
     prediction = predict(data)
     return prediction
+
+@app.post('/predict_many')
+async def post_predict_many(request_form_many: RequestFormMany) -> PredictionMany:
+    data = request_form_many.model_dump()
+    predictions = PredictionMany(predictions=[predict(form) for form in data['data']])
+    return predictions
+
+# @app.post('/evaluate')
+# async def post_evaluate(request_form_eval: RequestFormEval) -> Eval:
+#     data = request_form_eval.model_dump()
+#     predictions = [predict(form) for form in data['data']['X']]
+#     metrics = get_metrics(predictions, data['data']['y'])
+#     e = Eval(metrics)
+#     return e
