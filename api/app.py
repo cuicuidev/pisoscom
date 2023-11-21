@@ -7,17 +7,70 @@ import glob
 import pickle as pkl
 
 class StateEnum(str, Enum):
-    a_reformar = ' A reformar'
-    reformado = ' Reformado'
-    a_estrenar = ' A estrenar'
-    en_buen_estado = ' En buen estado'
+    a_reformar = 'A reformar'
+    reformado = 'Reformado'
+    a_estrenar = 'A estrenar'
+    en_buen_estado = 'En buen estado'
+
+class ProvinceEnum(str, Enum):
+    a_coruna = 'A Coruña'
+    alacant = 'Alacant'
+    albacete = 'Albacete'
+    almeria = 'Almería'
+    araba = 'Araba'
+    asturias = 'Asturias'
+    badajoz = 'Badajoz'
+    barcelona = 'Barcelona'
+    bizkaia = 'Bizkaia'
+    cantabria = 'Cantabria'
+    castello = 'Castelló'
+    ceuta = 'Ceuta'
+    ciudad_real = 'Ciudad Real'
+    cuenca = 'Cuenca'
+    caceres = 'Cáceres'
+    cadiz = 'Cádiz'
+    cordoba = 'Córdoba'
+    gipuzcoa = 'Gipuzcoa'
+    girona = 'Girona'
+    granada = 'Granada'
+    guadalajara = 'Guadalajara'
+    huelva = 'Huelva'
+    huesca = 'Huesca'
+    illes_balears = 'Illes Balears'
+    jaen = 'Jaén'
+    la_rioja = 'La Rioja'
+    las_palmas = 'Las Palmas'
+    leon = 'León'
+    lleida = 'Lleida'
+    lugo = 'Lugo'
+    madrid = 'Madrid'
+    melilla = 'Melilla'
+    murcia = 'Murcia'
+    malaga = 'Málaga'
+    navarra = 'Navarra'
+    ourense = 'Ourense'
+    palencia = 'Palencia'
+    pontevedra = 'Pontevedra'
+    salamanca = 'Salamanca'
+    santa_cruz_de_tenerife = 'Santa Cruz de Tenerife'
+    segovia = 'Segovia'
+    sevilla = 'Sevilla'
+    soria = 'Soria'
+    tarragona = 'Tarragona'
+    teruel = 'Teruel'
+    toledo = 'Toledo'
+    valladolid = 'Valladolid'
+    valencia = 'València'
+    zamora = 'Zamora'
+    zaragoza = 'Zaragoza'
+    avila = 'Ávila'
 
 class RequestForm(BaseModel):
     lat: float
     lng: float
     surface: float
     bathrooms: int
-    province: str
+    province: ProvinceEnum
     rooms: int
     garden: bool
     age: float
@@ -105,6 +158,5 @@ async def root() -> dict:
 @app.post('/predict')
 async def post_predict(request_form: RequestForm) -> Prediction:
     data = request_form.model_dump()
-    print(data)
     prediction = predict(data)
     return prediction
