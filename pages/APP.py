@@ -31,6 +31,8 @@ def app():
     
     #st.write('<div style="text-align: justify;"> Escoge las características de tu vivienda en Madrid para obtener un precio .</div>', unsafe_allow_html=True)  
 
+    
+    
     lat, lng = 35.782170703266075, -8.041992187500002 # Localiza el centro del mapa que vamos a mostrar
 
     m = folium.Map(location=(lat, lng), zoom_start=5)
@@ -52,12 +54,12 @@ def app():
     del df_provincias
     del df_25
 
-    #Elección de provincia
+    # Elección de provincia
     # province=st.sidebar.selectbox("Elige tu ciudad",lista_provincias) # Cambiar por la función getprovince()
     province = getProvince(lat, lng)
     st.write(f'LA PROVINCIA ELEGIDA ES: {province}')
     if province == 'Fail':
-        st.write('Debe hacer click en una ubicacación perteneciente a España.')
+        st.write('Haz click en una ubicacación perteneciente a España.')
 
     # Slider de selección m2.
     surface=st.sidebar.slider("Selecciona los metros cuadrados de tu vivienda:", min_value=0, max_value=300, value=75, step=1)    
