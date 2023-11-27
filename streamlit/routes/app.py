@@ -68,9 +68,9 @@ def app():
     else:
         st.info(f'La provincia seleccionada es: {province}')
 
-    if st.button("Calcular precio de la vivienda"):
-        price = predict(lat, lng, surface, bathrooms, province, rooms, garden, age, net_surface, elevator, garage, build_condition, drop_outliers)
-        st.success(price)
+        if st.button("Calcular precio de la vivienda"):
+            price = predict(lat, lng, surface, bathrooms, province, rooms, garden, age, net_surface, elevator, garage, build_condition, drop_outliers)
+            st.success(price)
     # </BODY>
 
 def predict(
@@ -134,7 +134,7 @@ def predict(
 def get_paths(province, drop_outliers = True):
     general_model = False
 
-    paths = glob.glob("assets/models/*.pkl")
+    paths = glob.glob(os.path.join(WORKDIR, "assets/models/*.pkl"))
     paths = [path for path in paths if province.lower() in path.split('/')[-1].lower()]
     if len(paths) == 0:
         model_path = os.path.join(WORKDIR, 'assets/models/model_30.pkl')
