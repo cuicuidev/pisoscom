@@ -1,17 +1,9 @@
-# Modelo Deep Learning predicción de precios de la vivienda.
+# Calculadora de precios de viviendas
 
-Es:
-El objeto del siguiente proyecto hacer una APP que nos permita saber el precio de mercado de una vivienda dadas sus caracteristicas.
+Este repositorio contiene el código de la recolección de datos, del entrenamiento de un modelo de regresión y de interfaces gráfica y API para el modelo en cuestión. Los datos fueron recolectados mediante técnicas de web scraping de manera automatizada gracias al motor de Selenium. Se entrenaron varios modelos Random Forest para el cálculo del precio de los inmuebles. Estos modelos están disponibles en la web como una [app de Streamlit](https://property-price-calculator.streamlit.app). También proporcionamos una imágen de una API estilo REST que pueden desplegar en su servidor para usar el modelo en un entorno de producción.
 
-En:
-The aim of the following project is to determine the market price of a house depending on its characteristics.
-
-Para scrapear una pagina (los datos se guardan en `scraping/data/`)
-```sh
-python cli.py scrape -e 'endpoint'
-```
-
-Para ver qué endpoints faltan por scrapear
-```sh
-python cli.py check
-```
+Navegación:
+- api: API estilo REST que unifica nuestros modelos en uno único.
+- ml: código de procesado de datos y entrenamiento de los modelos
+- scraping: aplicación cli para scrapear cómodamente los endpoints de nuestro _data source_
+- streamlit: app de Streamlit desplegada accesible a través de https://property-price-calculator.streamlit.app

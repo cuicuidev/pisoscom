@@ -95,10 +95,11 @@ def predict(
     model = load_pickle(model_path)
     encodings = load_pickle(encodings_path)
 
-    province = encodings['province'].to_dict()[province]
     build_condition = encodings['state'].to_dict()[' ' + build_condition]
 
     if general_model:
+        province = encodings['province'].to_dict()[province]
+
         price = model.predict([[
             lat, 
             lng, 
