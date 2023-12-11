@@ -1,0 +1,5 @@
+numpy==1.26.2
+pandas
+fastapi
+uvicorn
+scikit-learn
