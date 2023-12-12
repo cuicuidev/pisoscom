@@ -70,7 +70,7 @@ def app():
 
         if st.button("Calcular precio de la vivienda"):
             price = predict(lat, lng, surface, bathrooms, province, rooms, garden, age, net_surface, elevator, garage, build_condition, drop_outliers)
-            st.write(price)
+            st.success(price)
     # </BODY>
 
 def predict(
@@ -106,5 +106,5 @@ def predict(
    }
 
    response = requests.post(PREDICT_ONE, json=form)
-   price = response.json()
+   price = response.json().get('price')
    return price
