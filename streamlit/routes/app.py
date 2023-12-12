@@ -1,15 +1,15 @@
 import streamlit as st
 import pandas as pd
-import json
-import pickle as pkl
-import glob
-import os
 import folium
 from streamlit_folium import st_folium
 
 from .util import geo
 
-from config import WORKDIR
+from config import WORKDIR, PREDICT_ONE
+
+import requests
+import os
+import json
 
 def app():
 
@@ -70,7 +70,7 @@ def app():
 
         if st.button("Calcular precio de la vivienda"):
             price = predict(lat, lng, surface, bathrooms, province, rooms, garden, age, net_surface, elevator, garage, build_condition, drop_outliers)
-            st.success(price)
+            st.write(price)
     # </BODY>
 
 def predict(
@@ -89,73 +89,22 @@ def predict(
 
         drop_outliers: bool = True
         ) -> float:
-    
-    model_path, encodings_path, general_model = get_paths(province, drop_outliers)
+   form = {
+	   'lat': lat,
+	   'lng': lng,
+	   'surface': surface,
+	   'bathrooms': bathrooms,
+	   'province': province,
+	   'rooms': rooms,
+	   'garden': garden,
+	   'age': age,
+	   'useful_surface': net_surface,
+	   'elevator': elevator,
+	   'garage': garage,
+	   'state': build_condition,
+	   'drop_outliers': drop_outliers
+   }
 
-    model = load_pickle(model_path)
-    encodings = load_pickle(encodings_path)
-
-    build_condition = encodings['state'].to_dict()[' ' + build_condition]
-
-    if general_model:
-        province = encodings['province'].to_dict()[province]
-
-        price = model.predict([[
-            lat, 
-            lng, 
-            surface, 
-            bathrooms, 
-            province, 
-            rooms, 
-            garden, 
-            age, 
-            net_surface,
-            elevator,
-            garage,
-            build_condition,
-        ]])[0]
-        return price
-    
-    price = model.predict([[
-            lat, 
-            lng, 
-            surface, 
-            bathrooms,
-            rooms, 
-            garden, 
-            age, 
-            net_surface,
-            elevator,
-            garage,
-            build_condition,
-        ]])[0]
-    return price
-
-def get_paths(province, drop_outliers = True):
-    general_model = False
-
-    paths = glob.glob(os.path.join(WORKDIR, "assets/models/*.pkl"))
-    paths = [path for path in paths if province.lower() in path.split('/')[-1].lower()]
-    if len(paths) == 0:
-        model_path = os.path.join(WORKDIR, 'assets/models/model_30.pkl')
-        model_path_drop_outliers = os.path.join(WORKDIR, 'assets/models/model_30_no_outliers.pkl')
-
-        encodings_path = os.path.join(WORKDIR, 'assets/models/model_30_encodings.pkl')
-        encodings_path_drop_outliers = os.path.join(WORKDIR, 'assets/models/model_30_no_outliers_encodings.pkl')
-        general_model=True
-    else:
-        model_path = [path for path in paths if 'encodings' not in path and 'outliers' not in path][0]
-        model_path_drop_outliers = [path for path in paths if 'encodings' not in path and 'outliers' in path][0]
-
-        encodings_path = [path for path in paths if 'encodings' in path and 'outliers' not in path][0]
-        encodings_path_drop_outliers = [path for path in paths if 'encodings' in path and 'outliers' in path][0]
-
-    model_path = model_path_drop_outliers if drop_outliers else model_path
-    encodings_path = encodings_path_drop_outliers if drop_outliers else encodings_path
-
-    return model_path, encodings_path, general_model
-
-def load_pickle(path):
-    with open(path, 'br') as file:
-        payload = pkl.load(file)
-    return payload
+   response = requests.post(PREDICT_ONE, json=form)
+   price = response.json()
+   return price
