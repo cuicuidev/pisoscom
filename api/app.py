@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from enum import Enum
 import glob
 import pickle as pkl
+import json
 
 class StateEnum(str, Enum):
     a_reformar = 'A reformar'
@@ -100,14 +101,16 @@ app = FastAPI()
 
 def get_paths(province: str, drop_outliers: bool = True) -> tuple[str | bool]:
     m_30 = False
-    paths = glob.glob('./models/*.pkl')
+    paths_models = glob.glob('./models/*.pkl')
+    paths_encodings = glob.glob('./models/*.json')
+    paths = paths_models + paths_encodings
     paths = [path for path in paths if province in path]
     if len(paths) == 0:
         path = './models/model_30.pkl'
         path_no_outliers = './models/model_30_no_outliers.pkl'
 
-        encodings = './models/model_30_encodings.pkl'
-        encodings_no_outliers = './models/model_30_no_outliers_encodings.pkl'
+        encodings = './models/model_30_encodings.json'
+        encodings_no_outliers = './models/model_30_no_outliers_encodings.json'
         m_30=True
     else:
         path = [path for path in paths if 'encodings' not in path and 'outliers' not in path][0]
@@ -126,26 +129,31 @@ def load(path: str):
         content = pkl.load(file)
     return content
 
+def load_json(path: str):
+    with open(path, 'r') as file:
+        content = json.load(file)
+    return content
+
 def predict(data: dict) -> Prediction:
     province = data.get('province')
     drop_outliers = data.get('drop_outliers')
     model_path, encodings_path, m_30 = get_paths(province, drop_outliers)
 
     model = load(model_path)
-    encodings = load(encodings_path)
+    encodings = load_json(encodings_path)
 
     if m_30:
         del data['drop_outliers']
 
         data['province'] = encodings['province'][data['province']]
-        data['state'] = encodings['state'].to_dict()[' ' + data['state']]
+        data['state'] = encodings['state'][' ' + data['state']]
 
         price = model.predict([list(data.values())])
     else:
         del data['drop_outliers']
         del data['province']
 
-        data['state'] = encodings['state'].to_dict()[' ' + data['state']]
+        data['state'] = encodings['state'][' ' + data['state']]
 
         price = model.predict([list(data.values())])
 
