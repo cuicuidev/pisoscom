@@ -99,7 +99,7 @@ class PredictionMany(BaseModel):
 
 app = FastAPI()
 
-def get_paths(province: str, drop_outliers: bool = True) -> tuple[str | bool]:
+def get_paths(province: str, drop_outliers: bool = True) -> tuple[str, bool]:
     m_30 = False
     paths_models = glob.glob('./models/*.pkl')
     paths_encodings = glob.glob('./models/*.json')
