@@ -119,11 +119,11 @@ def get_paths(province: str, drop_outliers: bool) -> tuple:
     print(len(paths))
 
     if len(paths) == 0:
-        path = './models/model_30.pkl'
-        path_no_outliers = './models/model_30_no_outliers.pkl'
+        path = './streamlit/models/model_30.pkl'
+        path_no_outliers = './streamlit/models/model_30_no_outliers.pkl'
 
-        path_encodings = './models/model_30_encodings.json'
-        path_encodings_no_outliers = './models/model_30_no_outliers_encodings.json'
+        path_encodings = './streamlit/models/model_30_encodings.json'
+        path_encodings_no_outliers = './streamlit/models/model_30_no_outliers_encodings.json'
 
         general_model = True
     else:
