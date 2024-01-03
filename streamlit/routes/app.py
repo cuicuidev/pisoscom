@@ -115,7 +115,7 @@ def get_paths(province: str, drop_outliers: bool) -> tuple:
     paths_models = glob.glob('./models/*.pkl')
     paths_encodings = glob.glob('./models/*.json')
     paths = paths_models + paths_encodings
-    paths = [path for path in paths if province.lower() in path]
+    paths = [path for path in paths if province.lower() in path.lower()]
 
     print(len(paths))
 
