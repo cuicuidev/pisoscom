@@ -27,3 +27,18 @@ if PREDICT_ONE is None:
                 break
     except:
         pass
+
+USE_API = os.environ.get('USE_API')
+
+if USE_API is None:
+    try:
+        with open('.env') as file:
+            env = file.readlines()
+
+        for line in env:
+            key, value = line.split('=')
+            if key == 'USE_API':
+                USE_API = value.strip()
+                break
+    except:
+        pass
