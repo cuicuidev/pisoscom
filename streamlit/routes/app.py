@@ -5,7 +5,7 @@ from streamlit_folium import st_folium
 
 from .util import geo
 
-from config import WORKDIR, PREDICT_ONE
+from config import WORKDIR, PREDICT_ONE, USE_API
 
 import requests
 import os
@@ -92,8 +92,7 @@ def predict(
         drop_outliers: bool = True
         ) -> float:
     
-    use_api = False
-    if use_api:
+    if USE_API:
         price = predict_api(lat, lng, surface, bathrooms, province, rooms, garden, age, net_surface, elevator, garage, build_condition, drop_outliers)
     else:
         price = predict_local(lat, lng, surface, bathrooms, province, rooms, garden, age, net_surface, elevator, garage, build_condition, drop_outliers)
