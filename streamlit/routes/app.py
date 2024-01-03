@@ -10,6 +10,8 @@ from config import WORKDIR, PREDICT_ONE
 import requests
 import os
 import json
+import pickle as pkl
+import glob
 
 def app():
 
@@ -74,6 +76,108 @@ def app():
     # </BODY>
 
 def predict(
+        lat: float,
+        lng: float,
+        surface: float,
+        bathrooms: int,
+        province: str,
+        rooms: int,
+        garden: bool,
+        age: float,
+        net_surface: float,
+        elevator: bool,
+        garage: bool,
+        build_condition: str,
+
+        drop_outliers: bool = True
+        ) -> float:
+    
+    use_api = False
+    if use_api:
+        price = predict_api(lat, lng, surface, bathrooms, province, rooms, garden, age, net_surface, elevator, garage, build_condition, drop_outliers)
+    else:
+        price = predict_local(lat, lng, surface, bathrooms, province, rooms, garden, age, net_surface, elevator, garage, build_condition, drop_outliers)
+
+    return price
+
+def load_pickle(path: str) -> object:
+    with open(path, 'rb') as file:
+        model = pkl.load(file)
+    return model
+
+def load_json(path: str) -> dict:
+    with open(path, 'r') as file:
+        encodings = json.load(file)
+    return encodings
+
+def get_paths(province: str, drop_outliers: bool) -> tuple:
+    general_model = False
+    paths_models = glob.glob('./models/*.pkl')
+    paths_encodings = glob.glob('./models/*.json')
+    paths = paths_models + paths_encodings
+    paths = [path for path in paths if province.lower() in path]
+
+    print(len(paths))
+
+    if len(paths) == 0:
+        path = './models/model_30.pkl'
+        path_no_outliers = './models/model_30_no_outliers.pkl'
+
+        path_encodings = './models/model_30_encodings.json'
+        path_encodings_no_outliers = './models/model_30_no_outliers_encodings.json'
+
+        general_model = True
+    else:
+        path = [path for path in paths if 'encodings' not in path and 'no_outliers' not in path][0]
+        path_no_outliers = [path for path in paths if 'encodings' not in path  and 'no_outliers' in path][0]
+
+        path_encodings = [path for path in paths if 'encodings' in path and 'no_outliers' not in path][0]
+        path_encodings_no_outliers = [path for path in paths if 'encodings' in path and 'no_outliers' in path][0]
+
+    if drop_outliers:
+        return path_no_outliers, path_encodings_no_outliers, general_model
+    else:
+        return path, path_encodings, general_model
+
+def predict_local(
+        lat: float,
+        lng: float,
+        surface: float,
+        bathrooms: int,
+        province: str,
+        rooms: int,
+        garden: bool,
+        age: float,
+        net_surface: float,
+        elevator: bool,
+        garage: bool,
+        build_condition: str,
+
+        drop_outliers: bool = True
+        ) -> float:
+    
+    model_path, encodings_path, general_model = get_paths(province, drop_outliers)
+
+    model = load_pickle(model_path)
+    encodings = load_json(encodings_path)
+
+    if general_model:
+        province = encodings['province'][province]
+        build_condition = encodings['state'][' '+ build_condition]
+
+        price = model.predict([[lat, lng, surface, bathrooms, province, rooms, garden, age, net_surface, elevator, garage, build_condition]])[0]
+    else:
+
+        build_condition = encodings['state'][' ' + build_condition]
+
+        price = model.predict([[lat, lng, surface, bathrooms, rooms, garden, age, net_surface, elevator, garage, build_condition]])[0]
+
+    return price
+
+
+
+
+def predict_api(
         lat: float, 
         lng:float , 
         surface: float, 
