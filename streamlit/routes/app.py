@@ -111,8 +111,8 @@ def load_json(path: str) -> dict:
 
 def get_paths(province: str, drop_outliers: bool) -> tuple:
     general_model = False
-    paths_models = glob.glob('./models/*.pkl')
-    paths_encodings = glob.glob('./models/*.json')
+    paths_models = glob.glob('./streamlit/models/*.pkl')
+    paths_encodings = glob.glob('./streamlit/models/*.json')
     paths = paths_models + paths_encodings
     paths = [path for path in paths if province.lower() in path.lower()]
 
