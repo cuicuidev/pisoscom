@@ -5,9 +5,9 @@ PAGE_CONFIG = {
     "page_icon": ":house:",
     "initial_sidebar_state": "expanded",
     "menu_items": {
-        'Get Help': 'https://www.extremelycoolapp.com/help',
-        'Report a bug': "https://www.extremelycoolapp.com/bug",
-        'About': "# This is a header. This is an *extremely* cool app!"
+        'Get Help': 'mailto:dmitryryzhenkov@cuicui.dev?subject=Property Price Predictor Help',
+        'Report a bug': "https://github.com/cuicuidev/pisoscom/issues/new/choose",
+        'About': "# About\n\nThis app is a demo of a machine learning model that predicts the price of a property in Spain.\n\nThe model is trained on data from [pisos.com](https://www.pisos.com/).\n\nThe source code is available on [GitHub](https://github.com/cuicuidev/pisoscom).\n\n---\n\nMade by [Dmitry Ryzhenkov](https://cuicui.dev/), [Miguel Nieto Paredes](https://www.linkedin.com/in/miguel-nieto-p) and [Jose Daniel Lema Martinez](https://www.linkedin.com/in/jose-daniel-lema-martinez)." 
     }
 }
 
